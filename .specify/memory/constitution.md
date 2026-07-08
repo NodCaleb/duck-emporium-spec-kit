@@ -1,50 +1,152 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version change: (template) → 1.0.0
+Modified principles: N/A — first constitution, all sections are new
+Added sections: Core Principles (I–V), Technology Stack, Development Workflow, Governance
+Removed sections: N/A
+Templates reviewed:
+  ✅ .specify/templates/plan-template.md   — Constitution Check section is generic; aligns with principles as written
+  ✅ .specify/templates/spec-template.md   — structure compatible; no updates required
+  ✅ .specify/templates/tasks-template.md  — task categories (setup, foundation, user story phases) align with principles
+Deferred TODOs: none
+-->
+
+# Rubber Duck Emporium Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. API Contract First
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Every HTTP endpoint MUST return a consistent JSON envelope:
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- **Success**: `{ "success": true, "data": <payload> }`
+- **Error**: `{ "success": false, "error": "<human-readable message>" }`
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+The `data` field MUST be omitted on error; the `error` field MUST be omitted on success.
+Raw exceptions, stack traces, or framework error objects MUST NOT leak to API consumers.
+Field-level validation errors MUST name the offending field.
+All API routes live under `/api/...` with no version prefix for this scope.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+**Rationale**: A predictable envelope lets the frontend handle every response with a single
+code path and eliminates ambiguity about what constitutes a success or failure.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### II. Test-First (NON-NEGOTIABLE)
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+Every acceptance scenario defined in a feature spec MUST have a corresponding Vitest test
+written *before* the implementation is considered complete. The Red-Green-Refactor cycle
+is mandatory:
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+1. Write a failing test that mirrors the acceptance scenario.
+2. Implement the minimum code required to make it pass.
+3. Refactor without re-breaking the test.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+Unit tests cover pure logic (quiz scoring, stock label formatting, etc.).
+Integration tests cover full HTTP request–response cycles against a test SQLite database.
+100% of spec-defined acceptance scenarios MUST pass before a feature is closed.
+
+**Rationale**: Tests are the executable form of the spec. Scenarios that lack a test
+have not been delivered — they have been guessed.
+
+### III. SQLite as Single Source of Truth
+
+All persistent data (catalog, stock levels, orders) MUST live in a SQLite database managed
+via `better-sqlite3`. No data that survives a process restart may be stored only in memory.
+
+Multi-step writes (e.g., checkout: decrement stock for N items + create order + clear cart)
+MUST execute inside a single SQLite transaction. Partial commits are not acceptable.
+
+In-memory session carts are acceptable because cross-session persistence is explicitly
+out of scope; they MUST NOT be used for anything that must survive a restart.
+
+**Rationale**: SQLite's synchronous API and built-in transaction support provide the
+atomicity guarantees required by the checkout and stock-management flows without
+introducing an external dependency.
+
+### IV. Simplicity — No Unnecessary Complexity
+
+- **No build step**: The web frontend MUST be served as static vanilla HTML/CSS/JS files.
+  No bundler (Webpack, Vite, Rollup) and no UI framework (React, Vue, Svelte) may be
+  introduced. A single pre-bundled file is acceptable only if generated by the server itself
+  (e.g., template rendering).
+- **No ORM**: SQL queries MUST be written directly using `better-sqlite3`; no ORM or
+  query-builder library may be added.
+- **YAGNI**: Features, abstractions, or dependencies not required by the current spec MUST
+  NOT be added. Complexity introduced beyond the spec requires explicit written justification.
+- **Responsive baseline**: The frontend MUST be usable at 375 px viewport width with zero
+  horizontal scroll on any page.
+
+**Rationale**: The project is a single-process workshop application. Every layer of
+abstraction or tooling adds maintenance surface without corresponding business benefit.
+
+### V. Security by Default
+
+- **Admin authentication**: The admin endpoint MUST read the shared password exclusively
+  from an environment variable. The password MUST NOT be hard-coded, logged, or returned
+  in any response. Requests with a missing or incorrect password MUST return HTTP 401.
+- **No PII in logs**: Log entries (stdout via `console.log`) MUST contain timestamps and
+  operational data only. Customer names, email addresses, shipping addresses, and card
+  strings MUST NOT appear in any log line.
+- **Input validation at boundaries**: All data arriving via HTTP (body, headers, query
+  params) MUST be validated before reaching business logic. Validation errors MUST be
+  returned as structured API error responses (Principle I), not unhandled exceptions.
+- **Stock integrity**: Stock decrements at checkout MUST be performed inside a transaction
+  (Principle III) with a re-validation check at submission time — not at cart-add time.
+
+**Rationale**: Even for a workshop project, practising secure defaults builds correct
+habits and prevents accidental data exposure during live demonstrations.
+
+## Technology Stack
+
+| Concern         | Choice                                     | Constraint |
+|-----------------|--------------------------------------------|------------|
+| Runtime         | Node.js                                    | MUST be ≥ 20 (LTS) |
+| HTTP framework  | Express                                    | No replacement |
+| Storage         | SQLite via `better-sqlite3`                | No other persistence layer |
+| Testing         | Vitest                                     | Only test framework allowed |
+| Code style      | ESLint + Prettier                          | No linting errors in committed code |
+| Frontend        | Vanilla HTML / CSS / JavaScript            | No build step; no UI framework |
+| Logging         | `console.log` / stdout                     | No logging library |
+| Authentication  | Single shared env-var password (admin only)| No JWT, no sessions for admin |
+| Session ID      | Client-provided UUID in `X-Session-ID` header | Required on all cart endpoints |
+
+Node.js version, framework, and storage backend are **fixed** for this project scope.
+Changes to this table require a MAJOR version bump of this constitution.
+
+## Development Workflow
+
+1. **Spec before code**: Every feature MUST have an accepted spec.md with acceptance
+   scenarios before any implementation begins.
+2. **Test before ship**: Principle II (Test-First) gates every feature closure.
+3. **Lint before commit**: `eslint` and `prettier --check` MUST pass with zero errors.
+   Warnings are permitted but MUST be documented if left unresolved.
+4. **Environment variables**: All secrets and environment-specific values MUST be supplied
+   via a `.env` file (local, git-ignored) or the process environment. A `.env.example`
+   MUST be kept up to date with all required variable names (values redacted).
+5. **Seed on first run**: The application MUST auto-seed the SQLite database with the
+   required 10+ ducks across 3+ categories when the database file does not yet exist.
+   The seed routine MUST be idempotent (re-running it on an existing DB must be a no-op).
+6. **No cross-contamination**: Test runs MUST use a separate in-memory or temp-file SQLite
+   database. They MUST NOT read from or write to the development database.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices and informal agreements for
+the Rubber Duck Emporium project. In the event of a conflict between the constitution and
+any other document (plan, task list, code comment), the constitution takes precedence.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment procedure**:
+1. Propose the change by editing a draft of this file.
+2. Increment the version number according to semantic rules:
+   - **MAJOR**: Removal or incompatible redefinition of a principle.
+   - **MINOR**: New principle or section added; material expansion of existing guidance.
+   - **PATCH**: Clarifications, wording improvements, typo fixes.
+3. Update `LAST_AMENDED_DATE` to the date of the change (ISO 8601, `YYYY-MM-DD`).
+4. Add an entry to the Sync Impact Report HTML comment at the top of this file.
+5. Review all templates in `.specify/templates/` for alignment; update as needed.
+
+**Compliance review**: Every plan.md generated by `/speckit.plan` MUST include a
+Constitution Check gate that references all five principles above. Features that cannot
+pass the Constitution Check are blocked from implementation until resolved.
+
+**Version**: 1.0.0 | **Ratified**: 2026-07-08 | **Last Amended**: 2026-07-08
