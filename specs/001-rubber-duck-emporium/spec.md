@@ -189,6 +189,10 @@ Quincy takes a 6-question multiple-choice quiz and receives a recommended duck c
 
 ### Functional Requirements
 
+#### API Response Envelope
+
+- **FR-000**: All API endpoints MUST return JSON with a consistent envelope: `{ "success": true, "data": <payload> }` for successful responses and `{ "success": false, "error": "<human-readable message>" }` for error responses. The `data` field is omitted on error; the `error` field is omitted on success.
+
 #### Catalog
 
 - **FR-001**: System MUST serve a list of all ducks, each including: name, category, price, and tagline.
@@ -208,7 +212,8 @@ Quincy takes a 6-question multiple-choice quiz and receives a recommended duck c
 - **FR-009**: A customer MUST be able to remove a line item from the cart entirely.
 - **FR-010**: System MUST reject adding a quantity that exceeds available stock, with a clear message.
 - **FR-011**: System MUST display cart contents with a computed running total.
-- **FR-012**: Cart data MUST persist within a single session; cross-session persistence is not required.
+- **FR-012**: Cart data MUST persist within a single session; cross-session persistence is not required. The session is identified by a client-provided UUID sent in the `X-Session-ID` request header; the server uses this header to locate the correct cart.
+- **FR-012a**: All cart endpoints MUST require a non-empty `X-Session-ID` header; requests without this header MUST be rejected with HTTP 400.
 
 #### Checkout
 
@@ -239,8 +244,8 @@ Quincy takes a 6-question multiple-choice quiz and receives a recommended duck c
 
 #### Duck of the Day
 
-- **FR-031**: System MUST return exactly one duck per calendar day, with the same duck returned for all requests on the same day.
-- **FR-032**: Duck of the Day selection MUST deterministically skip sold-out ducks.
+- **FR-031**: System MUST return exactly one duck per calendar day, with the same duck returned for all requests on the same day. The selection formula is `dayOfYear % eligibleInStockDucks.length`, where `eligibleInStockDucks` is the list of in-stock ducks ordered by their catalog insertion order (DB row ID ascending).
+- **FR-032**: Duck of the Day selection MUST deterministically skip sold-out ducks; the eligible pool used in the modulo calculation contains only ducks with stock > 0.
 - **FR-033**: When all ducks are sold out, system MUST return a friendly fallback message — never an error response.
 - **FR-034**: The Duck of the Day MUST include a reference/link to its full detail page.
 
@@ -267,7 +272,7 @@ Quincy takes a 6-question multiple-choice quiz and receives a recommended duck c
 ### Key Entities *(include if feature involves data)*
 
 - **Duck**: A product in the catalog. Attributes: unique ID (auto-generated), name (unique string), category (one of the defined categories), price (positive number), tagline (short string), long description (string), personality traits (list of short strings), stock level (integer ≥ 0).
-- **Cart**: A session-scoped container. Attributes: session identifier, list of line items (duck ID + quantity), computed running total. Not persisted beyond the session lifetime.
+- **Cart**: A session-scoped container. Attributes: session identifier (client-provided UUID passed via `X-Session-ID` request header), list of line items (duck ID + quantity), computed running total. Not persisted beyond the session lifetime.
 - **Order**: A completed, persisted purchase. Attributes: unique order ID, line items (duck ID + name + quantity + unit price), order total, shipping name, shipping email, shipping address, timestamp.
 - **Quiz Question**: One question in the personality quiz. Attributes: question text, list of answer choices (each with answer text + score map keyed by duck category).
 - **Quiz Result**: Output of a quiz submission. Attributes: recommended duck (full record), personalized message, link to duck detail page.
@@ -315,7 +320,7 @@ Quincy takes a 6-question multiple-choice quiz and receives a recommended duck c
 ## Assumptions
 
 - The application is a single-process, local/workshop deployment; no cloud infrastructure, load balancing, or horizontal scaling is required.
-- Local file-based or SQLite storage is sufficient for both catalog data and order persistence; no external database is needed.
+- **SQLite** (via `better-sqlite3`) is the storage backend for catalog data, stock levels, and order persistence; its native transaction support is required for atomic multi-item stock decrements at checkout. No external database is needed.
 - A single shared admin password supplied via environment variable is the complete authentication mechanism for Dr. Mallard; no per-user admin accounts are needed.
 - Payment processing is permanently mocked; any non-empty string is accepted as card details; no real payment provider will ever be integrated in this project.
 - User accounts and persistent login for Quincy are out of scope; cart state is session-scoped only.
@@ -326,3 +331,16 @@ Quincy takes a 6-question multiple-choice quiz and receives a recommended duck c
 - The "personality traits" field on a Duck entity is a list of short strings (e.g., `["Methodical", "Patient", "Judgmental"]`).
 - Automated tests for all acceptance criteria are implemented using the vitest framework.
 - The five duck categories are fixed for this scope: Debugging Ducks, Philosopher Ducks, Maritime Ducks, Wellness Ducks, Limited Editions.
+- The backend is implemented in **Node.js** using the **Express** HTTP framework; the frontend and test suite share the same JavaScript/Node.js runtime.
+
+---
+
+## Clarifications
+
+### Session 2026-07-08
+
+- Q: What runtime and server framework should the backend use? → A: Node.js + Express
+- Q: How should cart sessions be identified between client and server? → A: Client-provided UUID in `X-Session-ID` request header
+- Q: Which storage backend should be used for persistence and atomic stock decrements? → A: SQLite via `better-sqlite3`
+- Q: What formula determines the Duck of the Day rotation across calendar days? → A: `dayOfYear % eligibleInStockDucks.length` (insertion-order list, no stored state)
+- Q: What JSON envelope format should all API responses follow? → A: `{ "success": true/false, "data": … }` on success; `{ "success": false, "error": "…" }` on error
