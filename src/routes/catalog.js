@@ -54,4 +54,3 @@ export default function catalogRouter(db) {
 
   return router;
 }
-

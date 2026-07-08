@@ -99,8 +99,10 @@ function hideError(elementId) {
  */
 function friendlyError(err) {
   if (err.status === 404) return err.message || 'That item could not be found.';
-  if (err.status === 409) return err.message || 'Request conflict — please check stock and try again.';
-  if (err.status === 400) return err.message || 'Invalid input — please check your details and try again.';
+  if (err.status === 409)
+    return err.message || 'Request conflict — please check stock and try again.';
+  if (err.status === 400)
+    return err.message || 'Invalid input — please check your details and try again.';
   return err.message || 'Something went wrong. Please try again.';
 }
 
@@ -135,7 +137,7 @@ async function refreshCartCount() {
 /** Reads the current filter inputs and returns a plain object. */
 function getCurrentFilters() {
   return {
-    search:   document.getElementById('search-input').value.trim(),
+    search: document.getElementById('search-input').value.trim(),
     category: document.getElementById('category-filter').value,
     minPrice: document.getElementById('min-price').value.trim(),
     maxPrice: document.getElementById('max-price').value.trim(),
@@ -154,7 +156,7 @@ async function loadCatalog(filters = {}) {
 
   try {
     const params = new URLSearchParams();
-    if (filters.search)   params.set('search',   filters.search);
+    if (filters.search) params.set('search', filters.search);
     if (filters.category) params.set('category', filters.category);
     if (filters.minPrice) params.set('minPrice', filters.minPrice);
     if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
@@ -168,7 +170,9 @@ async function loadCatalog(filters = {}) {
       return;
     }
 
-    grid.innerHTML = ducks.map((duck) => `
+    grid.innerHTML = ducks
+      .map(
+        (duck) => `
       <article class="duck-card">
         <div class="duck-emoji">🦆</div>
         <h2 class="duck-name">${esc(duck.name)}</h2>
@@ -180,7 +184,9 @@ async function loadCatalog(filters = {}) {
         </div>
         <button class="btn-secondary view-detail-btn" data-id="${duck.id}">View Details</button>
       </article>
-    `).join('');
+    `,
+      )
+      .join('');
 
     grid.querySelectorAll('.view-detail-btn').forEach((btn) => {
       btn.addEventListener('click', () => loadDuckDetail(Number(btn.dataset.id)));
@@ -204,9 +210,9 @@ async function loadDuckDetail(id) {
   content.innerHTML = '<p class="loading">Loading duck details…</p>';
 
   try {
-    const data  = await fetchAPI('GET', `/api/catalog/${id}`);
-    const duck  = data.duck;
-    const sold  = duck.stockLabel === 'Sold out';
+    const data = await fetchAPI('GET', `/api/catalog/${id}`);
+    const duck = data.duck;
+    const sold = duck.stockLabel === 'Sold out';
     const traits = Array.isArray(duck.personalityTraits)
       ? duck.personalityTraits.map((t) => `<li>${esc(t)}</li>`).join('')
       : '';
@@ -263,7 +269,10 @@ async function loadDuckDetail(id) {
 async function addToCart(duckId, quantity) {
   hideError('add-to-cart-error');
   const successEl = document.getElementById('add-to-cart-success');
-  if (successEl) { successEl.classList.add('hidden'); successEl.textContent = ''; }
+  if (successEl) {
+    successEl.classList.add('hidden');
+    successEl.textContent = '';
+  }
 
   try {
     await fetchAPI('POST', '/api/cart/items', { duckId, quantity });
@@ -283,24 +292,27 @@ async function loadCart() {
   showView('cart');
   hideError('cart-error');
   const content = document.getElementById('cart-content');
-  const footer  = document.getElementById('cart-footer');
+  const footer = document.getElementById('cart-footer');
   const totalEl = document.getElementById('cart-total-amount');
   content.innerHTML = '<p class="loading">Loading cart…</p>';
   footer.classList.add('hidden');
 
   try {
-    const data  = await fetchAPI('GET', '/api/cart');
+    const data = await fetchAPI('GET', '/api/cart');
     const items = data.items || [];
     const total = data.cartTotal || 0;
 
     if (items.length === 0) {
-      content.innerHTML = '<p class="empty-state">Your cart is empty. <br>Browse the catalog to find your duck!</p>';
+      content.innerHTML =
+        '<p class="empty-state">Your cart is empty. <br>Browse the catalog to find your duck!</p>';
       return;
     }
 
     content.innerHTML = `
       <ul class="cart-list">
-        ${items.map((item) => `
+        ${items
+          .map(
+            (item) => `
           <li class="cart-item">
             <span class="cart-item-emoji">🦆</span>
             <div class="cart-item-info">
@@ -323,7 +335,9 @@ async function loadCart() {
                     data-id="${item.duckId}"
                     aria-label="Remove ${esc(item.name)} from cart">✕</button>
           </li>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </ul>
     `;
 
@@ -408,10 +422,10 @@ async function handleCheckoutSubmit(e) {
   try {
     const fd = new FormData(e.target);
     const body = {
-      shippingName:    fd.get('shippingName'),
-      email:           fd.get('email'),
+      shippingName: fd.get('shippingName'),
+      email: fd.get('email'),
       shippingAddress: fd.get('shippingAddress'),
-      cardString:      fd.get('cardString'),
+      cardString: fd.get('cardString'),
     };
 
     const data = await fetchAPI('POST', '/api/checkout', body);
@@ -434,18 +448,22 @@ async function handleCheckoutSubmit(e) {
 function renderOrderConfirmation(order) {
   showView('order-confirmation');
   const content = document.getElementById('confirmation-content');
-  const items   = order.items || [];
+  const items = order.items || [];
 
   content.innerHTML = `
     <div class="order-id">Order ID: <code>${esc(order.id)}</code></div>
     <ul class="order-items">
-      ${items.map((item) => `
+      ${items
+        .map(
+          (item) => `
         <li class="order-item">
           <span class="order-item-name">${esc(item.name)}</span>
           <span class="order-item-qty">× ${item.quantity}</span>
           <span class="order-item-price">$${(Number(item.unitPrice) * item.quantity).toFixed(2)}</span>
         </li>
-      `).join('')}
+      `,
+        )
+        .join('')}
     </ul>
     <div class="order-total">Total: <strong>$${Number(order.total).toFixed(2)}</strong></div>
     <div class="order-date">Placed: ${new Date(order.createdAt).toLocaleString()}</div>
@@ -523,19 +541,27 @@ async function loadQuiz() {
 function renderQuizForm(container) {
   container.innerHTML = `
     <form id="quiz-form">
-      ${quizQuestions.map((q) => `
+      ${quizQuestions
+        .map(
+          (q) => `
         <div class="quiz-question" id="question-${q.index}">
           <p class="question-text">${q.index + 1}. ${esc(q.text)}</p>
           <div class="quiz-choices">
-            ${q.choices.map((c) => `
+            ${q.choices
+              .map(
+                (c) => `
               <label class="quiz-choice">
                 <input type="radio" name="q${q.index}" value="${c.index}" required>
                 <span>${esc(c.text)}</span>
               </label>
-            `).join('')}
+            `,
+              )
+              .join('')}
           </div>
         </div>
-      `).join('')}
+      `,
+        )
+        .join('')}
       <button type="submit" class="btn-primary quiz-submit-btn">Find My Duck! 🦆</button>
     </form>
     <div id="quiz-result" class="quiz-result hidden" aria-live="polite"></div>
@@ -594,7 +620,9 @@ function renderQuizResult(data) {
   resultEl.innerHTML = `
     <h2>You're a ${esc(data.recommendedCategory)} duck! 🎉</h2>
     <p class="quiz-message">${esc(data.message || '')}</p>
-    ${duck ? `
+    ${
+      duck
+        ? `
       <div class="quiz-duck-card">
         <div class="duck-emoji">🦆</div>
         <h3>${esc(duck.name)}</h3>
@@ -605,7 +633,9 @@ function renderQuizResult(data) {
           View Details
         </button>
       </div>
-    ` : '<p style="margin:12px 0;color:var(--color-text-muted)">No ducks currently available in this category.</p>'}
+    `
+        : '<p style="margin:12px 0;color:var(--color-text-muted)">No ducks currently available in this category.</p>'
+    }
     <button class="btn-ghost retake-quiz-btn" style="margin-top:12px">Retake Quiz</button>
   `;
 

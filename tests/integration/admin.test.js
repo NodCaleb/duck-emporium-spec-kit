@@ -60,10 +60,7 @@ describe('POST /api/catalog', () => {
   });
 
   it('newly added duck is visible in GET /api/catalog', async () => {
-    await request(app)
-      .post('/api/catalog')
-      .set('X-Admin-Password', ADMIN_PASSWORD)
-      .send(validDuck);
+    await request(app).post('/api/catalog').set('X-Admin-Password', ADMIN_PASSWORD).send(validDuck);
 
     const catalogRes = await request(app).get('/api/catalog');
     const names = catalogRes.body.data.ducks.map((d) => d.name);
@@ -91,10 +88,7 @@ describe('POST /api/catalog', () => {
   // Scenario 3: Duplicate name → 409
   it('returns 409 when a duck with the same name already exists', async () => {
     // First insert succeeds
-    await request(app)
-      .post('/api/catalog')
-      .set('X-Admin-Password', ADMIN_PASSWORD)
-      .send(validDuck);
+    await request(app).post('/api/catalog').set('X-Admin-Password', ADMIN_PASSWORD).send(validDuck);
 
     // Second insert with same name
     const res = await request(app)
@@ -175,7 +169,7 @@ describe('POST /api/catalog', () => {
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
     expect(res.body.error).toBe(
-      'category must be one of: Debugging Ducks, Philosopher Ducks, Maritime Ducks, Wellness Ducks, Limited Editions'
+      'category must be one of: Debugging Ducks, Philosopher Ducks, Maritime Ducks, Wellness Ducks, Limited Editions',
     );
   });
 

@@ -97,9 +97,7 @@ describe('GET /api/duck-of-the-day', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.duck).toBeNull();
-    expect(res.body.data.message).toBe(
-      'The pond is empty today, come back tomorrow.'
-    );
+    expect(res.body.data.message).toBe('The pond is empty today, come back tomorrow.');
   });
 
   it('returns duck with stock > 0 after restoring one duck from all-sold-out state', async () => {

@@ -32,4 +32,3 @@ export default function duckOfTheDayRouter(db) {
 
   return router;
 }
-

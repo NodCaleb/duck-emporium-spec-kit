@@ -8,7 +8,8 @@
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
  */
-export function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
+export function errorHandler(err, req, res, next) {
+  // eslint-disable-line no-unused-vars
   const status = err.status ?? err.statusCode ?? 500;
   const message = err.message || 'Internal server error';
   res.status(status).json({ success: false, error: message });

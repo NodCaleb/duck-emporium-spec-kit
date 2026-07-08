@@ -1,5 +1,4 @@
 import express from 'express';
-import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { errorHandler } from './middleware/errorHandler.js';

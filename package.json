@@ -14,7 +14,9 @@
     "uuid": "^11.1.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "eslint": "^9.7.0",
+    "globals": "^17.7.0",
     "prettier": "^3.3.3",
     "supertest": "^7.0.0",
     "vitest": "^2.0.5"

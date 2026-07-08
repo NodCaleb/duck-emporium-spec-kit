@@ -104,7 +104,7 @@ const SEED_DUCKS = [
     price: 34.99,
     tagline: 'Once upon a midnight deploy, while I pondered, weak and weary…',
     description:
-      'A gothic collector\'s edition draped in a tiny black cloak, this duck quotes Poe under its breath when you\'re on-call. Only 50 were ever made. Its hollow, soulful gaze has been known to improve documentation quality by up to 40% (unverified). Comes with a certificate of authenticity and a sense of impending dread.',
+      "A gothic collector's edition draped in a tiny black cloak, this duck quotes Poe under its breath when you're on-call. Only 50 were ever made. Its hollow, soulful gaze has been known to improve documentation quality by up to 40% (unverified). Comes with a certificate of authenticity and a sense of impending dread.",
     personality_traits: JSON.stringify(['Melancholy', 'Dramatic', 'Literary']),
     stock: 2,
   },

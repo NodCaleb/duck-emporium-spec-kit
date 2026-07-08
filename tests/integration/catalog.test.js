@@ -136,11 +136,14 @@ describe('GET /api/catalog with filters', () => {
     expect(res.body.success).toBe(true);
     const { ducks, count } = res.body.data;
     expect(count).toBeGreaterThanOrEqual(1);
-    expect(ducks.every((d) =>
-      d.name.toLowerCase().includes('pomodoro') ||
-      d.tagline.toLowerCase().includes('pomodoro') ||
-      true // description not in list response; count > 0 is enough
-    )).toBe(true);
+    expect(
+      ducks.every(
+        (d) =>
+          d.name.toLowerCase().includes('pomodoro') ||
+          d.tagline.toLowerCase().includes('pomodoro') ||
+          true, // description not in list response; count > 0 is enough
+      ),
+    ).toBe(true);
     expect(ducks.some((d) => d.name === 'Recharge Reginald')).toBe(true);
   });
 
@@ -150,9 +153,8 @@ describe('GET /api/catalog with filters', () => {
     expect(res.status).toBe(200);
     const { ducks } = res.body.data;
     expect(ducks.length).toBeGreaterThanOrEqual(1);
-    ducks.forEach((d) => {
-      const combined = (d.name + d.tagline).toLowerCase();
-      // Each returned duck must match in at least name or tagline (description not exposed in list)
+    ducks.forEach((_d) => {
+      // Each returned duck must match in at least name, tagline or description
       // The match may be in description; just assert count is less than total
     });
     // Should not return ducks with no connection to "quack"
@@ -193,7 +195,7 @@ describe('GET /api/catalog with filters', () => {
     // Debugging Ducks with price between 12 and 15:
     //   Rubber Inquisitor (14.99) ✓, Stack Trace Stanley (12.49) ✓, Breakpoint Betty (16.0) ✗
     const res = await request(app).get(
-      '/api/catalog?category=Debugging+Ducks&minPrice=12&maxPrice=15'
+      '/api/catalog?category=Debugging+Ducks&minPrice=12&maxPrice=15',
     );
     expect(res.status).toBe(200);
     const { ducks } = res.body.data;

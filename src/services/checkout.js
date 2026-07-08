@@ -68,27 +68,19 @@ export function processCheckout(db, sessionId, formData) {
   const transact = db.transaction(() => {
     // Re-validate stock for each item and decrement atomically
     for (const item of items) {
-      const duck = db
-        .prepare('SELECT id, name, stock FROM ducks WHERE id = ?')
-        .get(item.duckId);
+      const duck = db.prepare('SELECT id, name, stock FROM ducks WHERE id = ?').get(item.duckId);
 
       if (!duck || duck.stock < item.quantity) {
-        const err = new Error(
-          `'${item.name}' is no longer available in the requested quantity`,
-        );
+        const err = new Error(`'${item.name}' is no longer available in the requested quantity`);
         err.status = 409;
         throw err;
       }
 
-      db.prepare('UPDATE ducks SET stock = stock - ? WHERE id = ?').run(
-        item.quantity,
-        item.duckId,
-      );
+      db.prepare('UPDATE ducks SET stock = stock - ? WHERE id = ?').run(item.quantity, item.duckId);
     }
 
     // Compute order total from resolved cart items
-    const total =
-      Math.round(items.reduce((sum, item) => sum + item.lineTotal, 0) * 100) / 100;
+    const total = Math.round(items.reduce((sum, item) => sum + item.lineTotal, 0) * 100) / 100;
 
     // Insert order record
     db.prepare(
@@ -111,9 +103,7 @@ export function processCheckout(db, sessionId, formData) {
 
   // Fetch and return the persisted order record
   const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderId);
-  const orderItems = db
-    .prepare('SELECT * FROM order_items WHERE order_id = ?')
-    .all(orderId);
+  const orderItems = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(orderId);
 
   return {
     id: order.id,

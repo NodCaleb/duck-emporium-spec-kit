@@ -96,10 +96,7 @@ describe('POST /api/checkout — success path', () => {
     const initialStock = duck.stock;
     await addDuckToCart(duck.id, 2);
 
-    await request(app)
-      .post('/api/checkout')
-      .set('X-Session-ID', sessionId)
-      .send(VALID_FORM);
+    await request(app).post('/api/checkout').set('X-Session-ID', sessionId).send(VALID_FORM);
 
     const updatedDuck = db.prepare('SELECT stock FROM ducks WHERE id = ?').get(duck.id);
     expect(updatedDuck.stock).toBe(initialStock - 2);
@@ -109,10 +106,7 @@ describe('POST /api/checkout — success path', () => {
     const duck = getHighStockDuck();
     await addDuckToCart(duck.id, 1);
 
-    await request(app)
-      .post('/api/checkout')
-      .set('X-Session-ID', sessionId)
-      .send(VALID_FORM);
+    await request(app).post('/api/checkout').set('X-Session-ID', sessionId).send(VALID_FORM);
 
     const cartRes = await request(app).get('/api/cart').set('X-Session-ID', sessionId);
     expect(cartRes.body.data.items).toHaveLength(0);
@@ -224,10 +218,7 @@ describe('POST /api/checkout — out-of-stock at submission', () => {
     await addDuckToCart(duck.id, 1);
     db.prepare('UPDATE ducks SET stock = 0 WHERE id = ?').run(duck.id);
 
-    await request(app)
-      .post('/api/checkout')
-      .set('X-Session-ID', sessionId)
-      .send(VALID_FORM);
+    await request(app).post('/api/checkout').set('X-Session-ID', sessionId).send(VALID_FORM);
 
     const orders = db.prepare('SELECT * FROM orders').all();
     expect(orders).toHaveLength(0);

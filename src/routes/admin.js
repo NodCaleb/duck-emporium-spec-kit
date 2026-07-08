@@ -78,7 +78,9 @@ export default function adminRouter(db) {
       const errors = validateDuckInput(body);
       if (errors.length > 0) {
         const first = errors[0];
-        console.log(`[${ts}] ADMIN duck-add: name="${name ?? '<unknown>'}" status=rejected reason="${first.message}"`);
+        console.log(
+          `[${ts}] ADMIN duck-add: name="${name ?? '<unknown>'}" status=rejected reason="${first.message}"`,
+        );
         return res.status(400).json({ success: false, error: first.message });
       }
 
@@ -87,7 +89,7 @@ export default function adminRouter(db) {
       const result = db
         .prepare(
           `INSERT INTO ducks (name, category, price, tagline, description, personality_traits, stock)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(name, category, price, tagline, description, JSON.stringify(personalityTraits), stock);
 
@@ -110,9 +112,16 @@ export default function adminRouter(db) {
 
       return res.status(201).json({ success: true, data: { duck } });
     } catch (err) {
-      if (err.code === 'SQLITE_CONSTRAINT_UNIQUE' || (err.message && err.message.includes('UNIQUE constraint failed'))) {
-        console.log(`[${ts}] ADMIN duck-add: name="${name ?? '<unknown>'}" status=rejected reason="duplicate name"`);
-        return res.status(409).json({ success: false, error: `A duck named '${name}' already exists` });
+      if (
+        err.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+        (err.message && err.message.includes('UNIQUE constraint failed'))
+      ) {
+        console.log(
+          `[${ts}] ADMIN duck-add: name="${name ?? '<unknown>'}" status=rejected reason="duplicate name"`,
+        );
+        return res
+          .status(409)
+          .json({ success: false, error: `A duck named '${name}' already exists` });
       }
       next(err);
     }
@@ -120,4 +129,3 @@ export default function adminRouter(db) {
 
   return router;
 }
-

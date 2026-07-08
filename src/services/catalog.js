@@ -26,9 +26,7 @@ export function listDucks(db, filters = {}) {
 
   if (search) {
     const pattern = `%${search.toLowerCase()}%`;
-    conditions.push(
-      '(LOWER(name) LIKE ? OR LOWER(tagline) LIKE ? OR LOWER(description) LIKE ?)'
-    );
+    conditions.push('(LOWER(name) LIKE ? OR LOWER(tagline) LIKE ? OR LOWER(description) LIKE ?)');
     params.push(pattern, pattern, pattern);
   }
 
@@ -70,9 +68,7 @@ export function listDucks(db, filters = {}) {
  * @returns {object|null}
  */
 export function getDuckById(db, id) {
-  const row = db
-    .prepare('SELECT * FROM ducks WHERE id = ?')
-    .get(id);
+  const row = db.prepare('SELECT * FROM ducks WHERE id = ?').get(id);
 
   if (!row) return null;
 

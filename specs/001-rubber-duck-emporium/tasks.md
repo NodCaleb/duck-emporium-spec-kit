@@ -214,13 +214,13 @@
 
 ### Tests for User Story 9 ⚠️ Write FIRST — must FAIL before implementation
 
-- [ ] T041 [P] [US9] Write unit tests for `scoreQuiz(answers)` — single category winner returned correctly, alphabetical tie-breaking (multiple tie scenarios), same answers always return same category, all-A answers resolve to `"Debugging Ducks"` — in `tests/unit/quizScoring.test.js`
-- [ ] T042 [P] [US9] Write integration tests for `GET /api/quiz` (returns exactly 6 questions, each with 4 choices, no `scores` field exposed) and `POST /api/quiz` (deterministic recommendation, tie-breaking, missing field → 400, wrong number of answers → 400, no DB state changes verified) — in `tests/integration/quiz.test.js`
+- [X] T041 [P] [US9] Write unit tests for `scoreQuiz(answers)` — single category winner returned correctly, alphabetical tie-breaking (multiple tie scenarios), same answers always return same category, all-A answers resolve to `"Debugging Ducks"` — in `tests/unit/quizScoring.test.js`
+- [X] T042 [P] [US9] Write integration tests for `GET /api/quiz` (returns exactly 6 questions, each with 4 choices, no `scores` field exposed) and `POST /api/quiz` (deterministic recommendation, tie-breaking, missing field → 400, wrong number of answers → 400, no DB state changes verified) — in `tests/integration/quiz.test.js`
 
 ### Implementation for User Story 9
 
-- [ ] T043 [US9] Create `src/services/quiz.js`: define frozen `QUIZ_QUESTIONS` array with all 6 questions and 4 choices each, including the full score maps from `specs/001-rubber-duck-emporium/spec.md` (Q3 choice A: Debugging +2 / Philosopher +1; Q3 choice C: Maritime +2 / Limited Editions +1; Q5 choice B: Philosopher +2 / Limited Editions +1; all others +3 single category); implement `scoreQuiz(answers)` that tallies category scores, sorts by score descending then category name ascending for tie-breaking, and returns the winning category string; implement `getPersonalizedMessage(category)` returning a distinct short message for each of the 5 categories
-- [ ] T044 [US9] Create `src/routes/quiz.js`: implement `GET /api/quiz` (returns all 6 questions with `index`, `text`, and `choices[{ index, text }]` — no score maps) and `POST /api/quiz` (validate `answers` array has exactly 6 elements with `questionIndex` 0–5 and `choiceIndex` 0–3, no duplicate `questionIndex`; call `scoreQuiz`; query `SELECT * FROM ducks WHERE category = ? ORDER BY id ASC LIMIT 1` for the winning category; return `{ "success": true, "data": { "recommendedCategory": "...", "duck": {...}, "message": "...", "detailUrl": "/api/catalog/:id" } }`); mount router in `src/app.js` under `/api/quiz`
+- [X] T043 [US9] Create `src/services/quiz.js`: define frozen `QUIZ_QUESTIONS` array with all 6 questions and 4 choices each, including the full score maps from `specs/001-rubber-duck-emporium/spec.md` (Q3 choice A: Debugging +2 / Philosopher +1; Q3 choice C: Maritime +2 / Limited Editions +1; Q5 choice B: Philosopher +2 / Limited Editions +1; all others +3 single category); implement `scoreQuiz(answers)` that tallies category scores, sorts by score descending then category name ascending for tie-breaking, and returns the winning category string; implement `getPersonalizedMessage(category)` returning a distinct short message for each of the 5 categories
+- [X] T044 [US9] Create `src/routes/quiz.js`: implement `GET /api/quiz` (returns all 6 questions with `index`, `text`, and `choices[{ index, text }]` — no score maps) and `POST /api/quiz` (validate `answers` array has exactly 6 elements with `questionIndex` 0–5 and `choiceIndex` 0–3, no duplicate `questionIndex`; call `scoreQuiz`; query `SELECT * FROM ducks WHERE category = ? ORDER BY id ASC LIMIT 1` for the winning category; return `{ "success": true, "data": { "recommendedCategory": "...", "duck": {...}, "message": "...", "detailUrl": "/api/catalog/:id" } }`); mount router in `src/app.js` under `/api/quiz`
 
 **Checkpoint**: Quiz returns deterministic results, tie-breaking works per spec, no DB writes on POST. All US9 tests pass.
 
@@ -230,10 +230,10 @@
 
 **Purpose**: Final code quality pass and end-to-end validation against quickstart.md
 
-- [ ] T045 [P] Run ESLint across all source and test files and fix all reported issues: `npx eslint src/ tests/ server.js --fix`
-- [ ] T046 [P] Run Prettier across all source and test files: `npx prettier --write src/ tests/ server.js .eslintrc.json .prettierrc`
-- [ ] T047 Perform quickstart.md validation: `npm install`, `cp .env.example .env` (set `ADMIN_PASSWORD=quack123`), `node server.js` — verify stdout shows `Database initialized`, `Seeded N ducks`, and `Server listening on http://localhost:3000` with no errors
-- [ ] T048 Run full test suite and verify zero failures: `npx vitest run` — all 46 acceptance scenario tests across `tests/unit/` and `tests/integration/` must pass with no skips
+- [X] T045 [P] Run ESLint across all source and test files and fix all reported issues: `npx eslint src/ tests/ server.js --fix`
+- [X] T046 [P] Run Prettier across all source and test files: `npx prettier --write src/ tests/ server.js .eslintrc.json .prettierrc`
+- [X] T047 Perform quickstart.md validation: `npm install`, `cp .env.example .env` (set `ADMIN_PASSWORD=quack123`), `node server.js` — verify stdout shows `Database initialized`, `Seeded N ducks`, and `Server listening on http://localhost:3000` with no errors
+- [X] T048 Run full test suite and verify zero failures: `npx vitest run` — all 46 acceptance scenario tests across `tests/unit/` and `tests/integration/` must pass with no skips
 
 ---
 

@@ -331,9 +331,7 @@ describe('Cart — full workflow (add, update, add second, remove first)', () =>
       .send({ duckId: duck2.id, quantity: 1 });
 
     // Remove duck1
-    await request(app)
-      .delete(`/api/cart/items/${duck1.id}`)
-      .set('X-Session-ID', sessionId);
+    await request(app).delete(`/api/cart/items/${duck1.id}`).set('X-Session-ID', sessionId);
 
     // Final cart — only duck2
     const res = await request(app).get('/api/cart').set('X-Session-ID', sessionId);

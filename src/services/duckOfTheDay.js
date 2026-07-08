@@ -25,9 +25,7 @@ export function getDayOfYear(date) {
  * @returns {object|null}
  */
 export function getDuckOfTheDay(db, date = new Date()) {
-  const rows = db
-    .prepare('SELECT * FROM ducks WHERE stock > 0 ORDER BY id ASC')
-    .all();
+  const rows = db.prepare('SELECT * FROM ducks WHERE stock > 0 ORDER BY id ASC').all();
 
   if (rows.length === 0) return null;
 
