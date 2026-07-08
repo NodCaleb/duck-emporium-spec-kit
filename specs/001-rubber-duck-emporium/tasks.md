@@ -101,12 +101,12 @@
 
 ### Tests for User Story 3 ⚠️ Write FIRST — must FAIL before implementation
 
-- [ ] T021 [P] [US3] Write integration tests covering all 5 cart acceptance scenarios (add item default qty 1, update qty, remove item, stock-exceeded rejection → 409, view total) plus missing `X-Session-ID` → 400 for all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PATCH /api/cart/items/:duckId`, `DELETE /api/cart/items/:duckId`) in `tests/integration/cart.test.js`
+- [X] T021 [P] [US3] Write integration tests covering all 5 cart acceptance scenarios (add item default qty 1, update qty, remove item, stock-exceeded rejection → 409, view total) plus missing `X-Session-ID` → 400 for all cart endpoints (`GET /api/cart`, `POST /api/cart/items`, `PATCH /api/cart/items/:duckId`, `DELETE /api/cart/items/:duckId`) in `tests/integration/cart.test.js`
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Create `src/services/cart.js`: module-level `Map<sessionId, CartItem[]>` store; implement `getCart(db, sessionId)` (resolves duck names and prices from DB, computes `lineTotal` per item and `cartTotal`), `addToCart(db, sessionId, duckId, quantity)` (validates duck exists, checks stock ≥ existing + new qty), `updateCartItem(db, sessionId, duckId, quantity)` (quantity 0 removes item; checks stock), and `removeCartItem(sessionId, duckId)`; export `clearCart(sessionId)` for checkout use
-- [ ] T023 [US3] Create `src/routes/cart.js`: mount `requireSession` on all routes; implement `GET /api/cart` (returns cart contents), `POST /api/cart/items` (validates `duckId` integer + optional `quantity ≥ 1`), `PATCH /api/cart/items/:duckId` (validates `duckId` + `quantity`), `DELETE /api/cart/items/:duckId`; return 404 when duck not found, 409 when stock exceeded; mount router in `src/app.js` under `/api/cart`
+- [X] T022 [US3] Create `src/services/cart.js`: module-level `Map<sessionId, CartItem[]>` store; implement `getCart(db, sessionId)` (resolves duck names and prices from DB, computes `lineTotal` per item and `cartTotal`), `addToCart(db, sessionId, duckId, quantity)` (validates duck exists, checks stock ≥ existing + new qty), `updateCartItem(db, sessionId, duckId, quantity)` (quantity 0 removes item; checks stock), and `removeCartItem(sessionId, duckId)`; export `clearCart(sessionId)` for checkout use
+- [X] T023 [US3] Create `src/routes/cart.js`: mount `requireSession` on all routes; implement `GET /api/cart` (returns cart contents), `POST /api/cart/items` (validates `duckId` integer + optional `quantity ≥ 1`), `PATCH /api/cart/items/:duckId` (validates `duckId` + `quantity`), `DELETE /api/cart/items/:duckId`; return 404 when duck not found, 409 when stock exceeded; mount router in `src/app.js` under `/api/cart`
 
 **Checkpoint**: Full cart CRUD works within a session. Stock exceeded → 409. Missing session → 400. All US3 tests pass.
 
@@ -120,12 +120,12 @@
 
 ### Tests for User Story 4 ⚠️ Write FIRST — must FAIL before implementation
 
-- [ ] T024 [P] [US4] Write integration tests for `POST /api/checkout` covering all 4 acceptance scenarios — success path (201, order created, stock decremented, cart cleared, confirmation returned), invalid/empty email (400 field-level error), out-of-stock at submission (409 naming the duck), order persistence (order row survives DB re-open) — in `tests/integration/checkout.test.js`
+- [X] T024 [P] [US4] Write integration tests for `POST /api/checkout` covering all 4 acceptance scenarios — success path (201, order created, stock decremented, cart cleared, confirmation returned), invalid/empty email (400 field-level error), out-of-stock at submission (409 naming the duck), order persistence (order row survives DB re-open) — in `tests/integration/checkout.test.js`
 
 ### Implementation for User Story 4
 
-- [ ] T025 [US4] Create `src/services/checkout.js`: implement `processCheckout(db, sessionId, formData)` — validate `shippingName`, `email` (regex `/.+@.+\..+/`), `shippingAddress`, `cardString` (all non-empty; field-level error messages); wrap the following in a `db.transaction()`: re-fetch current stock for each cart item, validate quantity ≤ stock (throw 409 error naming the duck on failure), decrement stock via `UPDATE ducks SET stock = stock - ? WHERE id = ?`, insert row into `orders` (UUID v4 id), insert rows into `order_items`; after transaction commits, call `clearCart(sessionId)`; return the full order record
-- [ ] T026 [US4] Create `src/routes/checkout.js`: mount `requireSession` middleware; implement `POST /api/checkout` — check cart is non-empty (400 `"Cart is empty"` if not), call `processCheckout`, return 201 `{ "success": true, "data": { "order": {...} } }` on success; handle 409 conflict errors from service; mount router in `src/app.js` under `/api/checkout`
+- [X] T025 [US4] Create `src/services/checkout.js`: implement `processCheckout(db, sessionId, formData)` — validate `shippingName`, `email` (regex `/.+@.+\..+/`), `shippingAddress`, `cardString` (all non-empty; field-level error messages); wrap the following in a `db.transaction()`: re-fetch current stock for each cart item, validate quantity ≤ stock (throw 409 error naming the duck on failure), decrement stock via `UPDATE ducks SET stock = stock - ? WHERE id = ?`, insert row into `orders` (UUID v4 id), insert rows into `order_items`; after transaction commits, call `clearCart(sessionId)`; return the full order record
+- [X] T026 [US4] Create `src/routes/checkout.js`: mount `requireSession` middleware; implement `POST /api/checkout` — check cart is non-empty (400 `"Cart is empty"` if not), call `processCheckout`, return 201 `{ "success": true, "data": { "order": {...} } }` on success; handle 409 conflict errors from service; mount router in `src/app.js` under `/api/checkout`
 
 **Checkpoint**: Complete purchase flow works end-to-end. Orders persist through restart. All US4 tests pass. **P1 MVP is fully deliverable at this point.**
 
