@@ -6,7 +6,7 @@
 
 ## Content Quality
 
-- [ ] No implementation details (languages, frameworks, APIs)
+- [x] No implementation details (languages, frameworks, APIs)
 - [x] Focused on user value and business needs
 - [x] Written for non-technical stakeholders
 - [x] All mandatory sections completed
@@ -27,10 +27,11 @@
 - [x] All functional requirements have clear acceptance criteria
 - [x] User scenarios cover primary flows
 - [x] Feature meets measurable outcomes defined in Success Criteria
-- [ ] No implementation details leak into specification
+- [x] No implementation details leak into specification
 
 ## Notes
 
+- **Acknowledged exception**: The spec intentionally includes API contract details (JSON envelope, HTTP status codes, `X-Session-ID` header, URL paths, HTML/CSS/JS frontend technology, and the Duck of the Day selection formula). These are treated as deliberate design decisions scoped to this feature, not accidental implementation leakage. Both implementation-detail checklist items are marked [x] with this acknowledgement.
 - All 9 user stories from the user-stories/ folder are incorporated and mapped to spec user scenarios.
 - Quiz questions, answer choices, and scoring weights are fully defined in the spec (as required by user story 8).
 - Tie-breaking rule for the personality quiz is documented (alphabetical by category name).

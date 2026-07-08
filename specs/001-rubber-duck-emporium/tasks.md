@@ -27,11 +27,11 @@
 
 **Purpose**: Project initialization, dependency installation, and tooling configuration
 
-- [ ] T001 Initialize Node.js project: create `package.json` with `"type": "module"`, `scripts.start: "node server.js"`, `scripts.test: "vitest run"`, dependencies (`express`, `better-sqlite3`, `dotenv`, `uuid`), and devDependencies (`vitest`, `supertest`, `eslint`, `prettier`)
-- [ ] T002 [P] Configure Vitest in `vitest.config.js`: set `globals: true`, `environment: "node"`, `include: ["tests/**/*.test.js"]`, and a test timeout of 10 000 ms
-- [ ] T003 [P] Configure ESLint in `.eslintrc.json` (ES2022 modules, Node.js globals) and Prettier in `.prettierrc` (single quotes, trailing commas, 100-char print width)
-- [ ] T004 Create `.env.example` with three lines: `ADMIN_PASSWORD=`, `PORT=3000`, `DB_PATH=./duck-emporium.db`
-- [ ] T005 Create project directory scaffold via `mkdir -p`: `src/db/`, `src/routes/`, `src/services/`, `src/middleware/`, `src/public/`, `tests/unit/`, `tests/integration/`
+- [X] T001 Initialize Node.js project: create `package.json` with `"type": "module"`, `scripts.start: "node server.js"`, `scripts.test: "vitest run"`, dependencies (`express`, `better-sqlite3`, `dotenv`, `uuid`), and devDependencies (`vitest`, `supertest`, `eslint`, `prettier`)
+- [X] T002 [P] Configure Vitest in `vitest.config.js`: set `globals: true`, `environment: "node"`, `include: ["tests/**/*.test.js"]`, and a test timeout of 10 000 ms
+- [X] T003 [P] Configure ESLint in `.eslintrc.json` (ES2022 modules, Node.js globals) and Prettier in `.prettierrc` (single quotes, trailing commas, 100-char print width)
+- [X] T004 Create `.env.example` with three lines: `ADMIN_PASSWORD=`, `PORT=3000`, `DB_PATH=./duck-emporium.db`
+- [X] T005 Create project directory scaffold via `mkdir -p`: `src/db/`, `src/routes/`, `src/services/`, `src/middleware/`, `src/public/`, `tests/unit/`, `tests/integration/`
 
 ---
 
@@ -41,14 +41,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Create `src/db/database.js`: export `openDatabase(path)` that returns a `better-sqlite3` `Database` instance; when `path` is `':memory:'` or `process.env.NODE_ENV === 'test'`, open an in-memory DB; enable WAL mode for the file-based instance
-- [ ] T007 Create `src/db/migrations.js`: export `runMigrations(db)` that executes `CREATE TABLE IF NOT EXISTS` for `ducks` (id, name UNIQUE, category CHECK, price CHECK >0, tagline, description, personality_traits TEXT, stock CHECK >=0, created_at), `orders` (id TEXT PK, shipping_name, shipping_email, shipping_address, card_string, total, created_at), and `order_items` (id AUTOINCREMENT, order_id FK, duck_id FK, duck_name, quantity CHECK >0, unit_price) as specified in `specs/001-rubber-duck-emporium/data-model.md`
-- [ ] T008 Create `src/db/seed.js`: export `seedDatabase(db)` that inserts exactly 10 ducks across all 5 categories (Debugging Ducks, Philosopher Ducks, Maritime Ducks, Wellness Ducks, Limited Editions) with realistic names, taglines, descriptions, personality traits, prices > 0, and stock values including at least one zero-stock duck; is a no-op if any rows already exist in `ducks`
-- [ ] T009 [P] Create `src/middleware/errorHandler.js`: four-argument Express error-handling middleware `(err, req, res, next)` that returns `{ "success": false, "error": "<err.message or 'Internal server error'>" }` with the appropriate HTTP status code (defaulting to 500); never exposes stack traces in the response body
-- [ ] T010 [P] Create `src/middleware/requireSession.js`: Express middleware that reads the `X-Session-ID` request header and calls `next()` if non-empty; otherwise responds with HTTP 400 `{ "success": false, "error": "X-Session-ID header is required" }`
-- [ ] T011 [P] Create `src/middleware/adminAuth.js`: Express middleware that reads the `X-Admin-Password` header, compares it (using constant-time comparison) to `process.env.ADMIN_PASSWORD`; responds with HTTP 401 `{ "success": false, "error": "Unauthorized" }` if the header is missing, empty, or does not match
-- [ ] T012 Create `src/app.js`: export `createApp(db)` factory that creates an Express instance, applies `express.json()`, mounts all route modules under `/api/` (catalog, cart, checkout, admin, duckOfTheDay, quiz), serves `src/public/` as static files at `/`, and attaches the `errorHandler` middleware last
-- [ ] T013 Create `server.js`: load `.env` with `dotenv/config`, call `openDatabase(process.env.DB_PATH)`, `runMigrations(db)`, `seedDatabase(db)`, `createApp(db)`, and `app.listen(process.env.PORT ?? 3000)` — log `[timestamp] Database initialized`, `[timestamp] Seeded N ducks`, `Server listening on http://localhost:<PORT>` to stdout
+- [X] T006 Create `src/db/database.js`: export `openDatabase(path)` that returns a `better-sqlite3` `Database` instance; when `path` is `':memory:'` or `process.env.NODE_ENV === 'test'`, open an in-memory DB; enable WAL mode for the file-based instance
+- [X] T007 Create `src/db/migrations.js`: export `runMigrations(db)` that executes `CREATE TABLE IF NOT EXISTS` for `ducks` (id, name UNIQUE, category CHECK, price CHECK >0, tagline, description, personality_traits TEXT, stock CHECK >=0, created_at), `orders` (id TEXT PK, shipping_name, shipping_email, shipping_address, card_string, total, created_at), and `order_items` (id AUTOINCREMENT, order_id FK, duck_id FK, duck_name, quantity CHECK >0, unit_price) as specified in `specs/001-rubber-duck-emporium/data-model.md`
+- [X] T008 Create `src/db/seed.js`: export `seedDatabase(db)` that inserts exactly 10 ducks across all 5 categories (Debugging Ducks, Philosopher Ducks, Maritime Ducks, Wellness Ducks, Limited Editions) with realistic names, taglines, descriptions, personality traits, prices > 0, and stock values including at least one zero-stock duck; is a no-op if any rows already exist in `ducks`
+- [X] T009 [P] Create `src/middleware/errorHandler.js`: four-argument Express error-handling middleware `(err, req, res, next)` that returns `{ "success": false, "error": "<err.message or 'Internal server error'>" }` with the appropriate HTTP status code (defaulting to 500); never exposes stack traces in the response body
+- [X] T010 [P] Create `src/middleware/requireSession.js`: Express middleware that reads the `X-Session-ID` request header and calls `next()` if non-empty; otherwise responds with HTTP 400 `{ "success": false, "error": "X-Session-ID header is required" }`
+- [X] T011 [P] Create `src/middleware/adminAuth.js`: Express middleware that reads the `X-Admin-Password` header, compares it (using constant-time comparison) to `process.env.ADMIN_PASSWORD`; responds with HTTP 401 `{ "success": false, "error": "Unauthorized" }` if the header is missing, empty, or does not match
+- [X] T012 Create `src/app.js`: export `createApp(db)` factory that creates an Express instance, applies `express.json()`, mounts all route modules under `/api/` (catalog, cart, checkout, admin, duckOfTheDay, quiz), serves `src/public/` as static files at `/`, and attaches the `errorHandler` middleware last
+- [X] T013 Create `server.js`: load `.env` with `dotenv/config`, call `openDatabase(process.env.DB_PATH)`, `runMigrations(db)`, `seedDatabase(db)`, `createApp(db)`, and `app.listen(process.env.PORT ?? 3000)` — log `[timestamp] Database initialized`, `[timestamp] Seeded N ducks`, `Server listening on http://localhost:<PORT>` to stdout
 
 **Checkpoint**: Foundation is ready — user story implementation can now begin in parallel
 
