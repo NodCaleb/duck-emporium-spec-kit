@@ -62,13 +62,13 @@
 
 ### Tests for User Story 1 ⚠️ Write FIRST — must FAIL before implementation
 
-- [ ] T014 [P] [US1] Write unit tests for the `stockLabel(stock)` pure function covering all three ranges (stock > 5 → `"In stock"`, stock 1–5 → `"Only N left"`, stock 0 → `"Sold out"`) in `tests/unit/stockLabel.test.js`
-- [ ] T015 [P] [US1] Write integration tests for `GET /api/catalog` — non-empty catalog returns all seeded ducks with required fields and correct envelope; empty catalog (all rows deleted) returns `{ ducks: [], count: 0 }` — in `tests/integration/catalog.test.js`
+- [X] T014 [P] [US1] Write unit tests for the `stockLabel(stock)` pure function covering all three ranges (stock > 5 → `"In stock"`, stock 1–5 → `"Only N left"`, stock 0 → `"Sold out"`) in `tests/unit/stockLabel.test.js`
+- [X] T015 [P] [US1] Write integration tests for `GET /api/catalog` — non-empty catalog returns all seeded ducks with required fields and correct envelope; empty catalog (all rows deleted) returns `{ ducks: [], count: 0 }` — in `tests/integration/catalog.test.js`
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Create `src/services/catalog.js`: implement `stockLabel(stock)` pure function and `listDucks(db, filters)` function (filters unused for US1 — full list only) that queries all ducks ordered by `id ASC` and adds `stockLabel` computed field to each record; `personality_traits` is JSON-parsed back to an array as `personalityTraits`
-- [ ] T017 [US1] Create `src/routes/catalog.js`: implement `GET /api/catalog` handler that calls `listDucks(db)` and returns `{ "success": true, "data": { "ducks": [...], "count": N } }`; mount router in `src/app.js` under `/api/catalog`
+- [X] T016 [US1] Create `src/services/catalog.js`: implement `stockLabel(stock)` pure function and `listDucks(db, filters)` function (filters unused for US1 — full list only) that queries all ducks ordered by `id ASC` and adds `stockLabel` computed field to each record; `personality_traits` is JSON-parsed back to an array as `personalityTraits`
+- [X] T017 [US1] Create `src/routes/catalog.js`: implement `GET /api/catalog` handler that calls `listDucks(db)` and returns `{ "success": true, "data": { "ducks": [...], "count": N } }`; mount router in `src/app.js` under `/api/catalog`
 
 **Checkpoint**: `GET /api/catalog` returns all ducks with correct envelope and stock labels. All US1 unit and integration tests pass.
 
@@ -82,12 +82,12 @@
 
 ### Tests for User Story 2 ⚠️ Write FIRST — must FAIL before implementation
 
-- [ ] T018 [P] [US2] Extend `tests/integration/catalog.test.js` with tests for `GET /api/catalog/:id` — valid ID returns full duck record with all detail fields; unknown integer ID returns 404; non-integer `:id` returns 400; ducks with stock 1–5 show `"Only N left"`, stock 0 shows `"Sold out"`
+- [X] T018 [P] [US2] Extend `tests/integration/catalog.test.js` with tests for `GET /api/catalog/:id` — valid ID returns full duck record with all detail fields; unknown integer ID returns 404; non-integer `:id` returns 400; ducks with stock 1–5 show `"Only N left"`, stock 0 shows `"Sold out"`
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Extend `src/services/catalog.js`: add `getDuckById(db, id)` that fetches the full duck row by integer `id`, parses `personality_traits` JSON as `personalityTraits`, computes `stockLabel`, and returns `null` when no row is found
-- [ ] T020 [US2] Extend `src/routes/catalog.js`: add `GET /api/catalog/:id` handler — parse and validate `:id` as a positive integer (return 400 `"Invalid duck ID"` if not), call `getDuckById`, return 200 with `{ "success": true, "data": { "duck": {...} } }` or 404 `{ "success": false, "error": "Duck not found" }`
+- [X] T019 [US2] Extend `src/services/catalog.js`: add `getDuckById(db, id)` that fetches the full duck row by integer `id`, parses `personality_traits` JSON as `personalityTraits`, computes `stockLabel`, and returns `null` when no row is found
+- [X] T020 [US2] Extend `src/routes/catalog.js`: add `GET /api/catalog/:id` handler — parse and validate `:id` as a positive integer (return 400 `"Invalid duck ID"` if not), call `getDuckById`, return 200 with `{ "success": true, "data": { "duck": {...} } }` or 404 `{ "success": false, "error": "Duck not found" }`
 
 **Checkpoint**: Both catalog endpoints are fully functional. All US1 and US2 tests pass.
 

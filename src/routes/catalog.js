@@ -1,6 +1,38 @@
 import { Router } from 'express';
+import { listDucks, getDuckById } from '../services/catalog.js';
 
-// Implemented in T016 (US1) and T017 (US1), extended in T019-T020 (US2), T028-T029 (US5)
-export default function catalogRouter(_db) {
-  return Router();
+export default function catalogRouter(db) {
+  const router = Router();
+
+  // GET /api/catalog — list all ducks (with optional filters, added in US5)
+  router.get('/', (req, res, next) => {
+    try {
+      const ducks = listDucks(db);
+      res.json({ success: true, data: { ducks, count: ducks.length } });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // GET /api/catalog/:id — single duck detail
+  router.get('/:id', (req, res, next) => {
+    try {
+      const parsed = Number(req.params.id);
+      if (!Number.isInteger(parsed) || parsed <= 0) {
+        return res.status(400).json({ success: false, error: 'Invalid duck ID' });
+      }
+
+      const duck = getDuckById(db, parsed);
+      if (!duck) {
+        return res.status(404).json({ success: false, error: 'Duck not found' });
+      }
+
+      res.json({ success: true, data: { duck } });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return router;
 }
+
