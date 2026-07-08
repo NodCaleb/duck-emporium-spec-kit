@@ -4,10 +4,29 @@ import { listDucks, getDuckById } from '../services/catalog.js';
 export default function catalogRouter(db) {
   const router = Router();
 
-  // GET /api/catalog — list all ducks (with optional filters, added in US5)
+  // GET /api/catalog — list all ducks (with optional filters)
   router.get('/', (req, res, next) => {
     try {
-      const ducks = listDucks(db);
+      const { search, category, minPrice: minPriceRaw, maxPrice: maxPriceRaw } = req.query;
+
+      let minPrice;
+      let maxPrice;
+
+      if (minPriceRaw !== undefined) {
+        minPrice = Number(minPriceRaw);
+        if (!Number.isFinite(minPrice)) {
+          return res.status(400).json({ success: false, error: 'minPrice must be a number' });
+        }
+      }
+
+      if (maxPriceRaw !== undefined) {
+        maxPrice = Number(maxPriceRaw);
+        if (!Number.isFinite(maxPrice)) {
+          return res.status(400).json({ success: false, error: 'maxPrice must be a number' });
+        }
+      }
+
+      const ducks = listDucks(db, { search, category, minPrice, maxPrice });
       res.json({ success: true, data: { ducks, count: ducks.length } });
     } catch (err) {
       next(err);

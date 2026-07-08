@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Rubber Duck Emporium</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-logo" id="logo-link">🦆 Duck Emporium</a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-btn" id="nav-catalog">Catalog</button>
+        <button class="nav-btn" id="nav-dotd">Duck of the Day</button>
+        <button class="nav-btn" id="nav-quiz">Quiz</button>
+        <button class="nav-btn nav-cart-btn" id="nav-cart">
+          Cart <span class="cart-badge" id="cart-count">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- Catalog View -->
+    <section id="view-catalog" class="view active" aria-labelledby="catalog-heading">
+      <h1 id="catalog-heading">Duck Catalog</h1>
+      <div class="filters" role="search" aria-label="Search and filter ducks">
+        <input type="text" id="search-input" placeholder="Search ducks…" aria-label="Search by name, tagline, or description">
+        <select id="category-filter" aria-label="Filter by category">
+          <option value="">All Categories</option>
+          <option value="Debugging Ducks">Debugging Ducks</option>
+          <option value="Philosopher Ducks">Philosopher Ducks</option>
+          <option value="Maritime Ducks">Maritime Ducks</option>
+          <option value="Wellness Ducks">Wellness Ducks</option>
+          <option value="Limited Editions">Limited Editions</option>
+        </select>
+        <input type="number" id="min-price" placeholder="Min $" aria-label="Minimum price" min="0" step="0.01">
+        <input type="number" id="max-price" placeholder="Max $" aria-label="Maximum price" min="0" step="0.01">
+        <button class="btn-primary" id="apply-filters">Search</button>
+        <button class="btn-ghost" id="clear-filters">Clear</button>
+      </div>
+      <div id="catalog-error" class="error-msg hidden" role="alert"></div>
+      <div id="duck-grid" class="duck-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- Duck Detail View -->
+    <section id="view-duck-detail" class="view" aria-label="Duck detail">
+      <button class="back-btn" id="back-to-catalog">← Back to Catalog</button>
+      <div id="duck-detail-error" class="error-msg hidden" role="alert"></div>
+      <div id="duck-detail-content"></div>
+    </section>
+
+    <!-- Cart View -->
+    <section id="view-cart" class="view" aria-labelledby="cart-heading">
+      <h1 id="cart-heading">Your Cart</h1>
+      <div id="cart-error" class="error-msg hidden" role="alert"></div>
+      <div id="cart-content" aria-live="polite"></div>
+      <div id="cart-footer" class="cart-footer hidden">
+        <div class="cart-total">Total: <strong id="cart-total-amount">$0.00</strong></div>
+        <button class="btn-primary" id="checkout-btn">Proceed to Checkout</button>
+      </div>
+    </section>
+
+    <!-- Checkout View -->
+    <section id="view-checkout" class="view" aria-labelledby="checkout-heading">
+      <h1 id="checkout-heading">Checkout</h1>
+      <button class="back-btn" id="back-to-cart">← Back to Cart</button>
+      <div id="checkout-error" class="error-msg hidden" role="alert"></div>
+      <form id="checkout-form" class="checkout-form" novalidate>
+        <div class="form-group">
+          <label for="shipping-name">Full Name</label>
+          <input type="text" id="shipping-name" name="shippingName" required autocomplete="name" placeholder="Ada Lovelace">
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="ada@example.com">
+        </div>
+        <div class="form-group">
+          <label for="shipping-address">Shipping Address</label>
+          <textarea id="shipping-address" name="shippingAddress" rows="3" required autocomplete="street-address" placeholder="123 Duck Lane, Quackville, QK 10001"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="card-string">Card Details <span class="form-hint">(any text accepted — payments are mocked)</span></label>
+          <input type="text" id="card-string" name="cardString" required autocomplete="off" placeholder="4242-4242-4242-4242">
+        </div>
+        <button type="submit" id="submit-checkout" class="btn-primary btn-full">Place Order 🦆</button>
+      </form>
+    </section>
+
+    <!-- Order Confirmation View -->
+    <section id="view-order-confirmation" class="view" aria-labelledby="confirmation-heading">
+      <div class="confirmation-panel">
+        <div class="confirmation-icon">🎉</div>
+        <h1 id="confirmation-heading">Order Confirmed!</h1>
+        <div id="confirmation-content"></div>
+        <button class="btn-primary" id="continue-shopping">Continue Shopping</button>
+      </div>
+    </section>
+
+    <!-- Duck of the Day View -->
+    <section id="view-duck-of-the-day" class="view" aria-labelledby="dotd-heading">
+      <h1 id="dotd-heading">🌟 Duck of the Day</h1>
+      <div id="dotd-error" class="error-msg hidden" role="alert"></div>
+      <div id="dotd-content" aria-live="polite"></div>
+    </section>
+
+    <!-- Quiz View -->
+    <section id="view-quiz" class="view" aria-labelledby="quiz-heading">
+      <h1 id="quiz-heading">Which Duck Are You? 🦆</h1>
+      <p class="quiz-intro">Answer 6 questions to discover your rubber duck soulmate.</p>
+      <div id="quiz-error" class="error-msg hidden" role="alert"></div>
+      <div id="quiz-content" aria-live="polite"></div>
+    </section>
+
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
