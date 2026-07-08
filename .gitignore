@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Environment variables (secrets must not be committed — see constitution §V & dev workflow §4)
+.env
+.env.local
+.env.*.local
+
+# SQLite database files (auto-seeded on first run — see dev workflow §5)
+*.db
+*.sqlite
+*.sqlite3
+
+# Vitest coverage output
+coverage/
+.nyc_output/
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime temp files
+tmp/
+temp/
